@@ -1,12 +1,7 @@
-import os
-import json
-
 from .exceptions import (
     KeyAlreadyExists,
 )
-from .data import (
-    DATA_STORE_FILE_NAME,
-)
+
 from . import utils
 
 """
@@ -19,17 +14,7 @@ AND 2ND ELEMENT IS THE EXPIRY TIME. (OR -1)
 
 class FreshStore:
     def __init__(self, file_path: str = None):
-        if file_path is None:
-            # FUNCTIONAL REQUIREMENTS - POINT 1
-            # If File Path is not provided, then set it as the
-            # current directory from where the script was called.
-            file_path = os.path.join(os.getcwd(), DATA_STORE_FILE_NAME)
-        self.file_path = file_path
-
-        if not os.path.exists(self._get_data_store_file()):
-            # Create data store if does not exist
-            with open(self._get_data_store_file(), 'w'):
-                pass
+        self.file_path = utils.initialize_date_store_file(file_path)
 
     def _get_data_store_file(self):
         return self.file_path
@@ -68,8 +53,7 @@ class FreshStore:
         value_file: str = ""
 
         if len(args) == 2:
-            file_name = args[1]
-            value_file = os.path.join(self.file_path, file_name)
+            value_file = args[1]
             val_size: int = self._validate_value(value_file)
 
         is_empty: bool = self._validate_data_store(val_size)
@@ -77,30 +61,24 @@ class FreshStore:
         return value_file, data_store
 
     def _rewrite_data_store(self, new_data_store: dict) -> None:
-        # Serialize data to be able to store more files.
-        # NON-FUNCTIONAL REQUIREMENTS - POINT 4
-        json_data_store: str = json.dumps(new_data_store, default=str)
+        data_store_file: str = self._get_data_store_file()
+        return utils.rewrite_data_store(data_store_file, new_data_store)
 
-        with open(self._get_data_store_file(), "w") as f:
-            # Override entire file
-            f.write(json_data_store)
+    @staticmethod
+    def _load_json_file(value_file):
+        return utils.load_json_file(value_file)
 
-    def create(self, key: str, file_name: str = "example_1.json", ttl: int = -1) -> None:
+    def create(self, key: str, val_file: str = "example_1.json", ttl: int = -1) -> None:
         """
         Creates an entry.
         :param ttl: Time in seconds
         :param key: key to be stored
-        :param file_name: the file containing the value
+        :param val_file: the file containing the value
         :return: None
         """
-        value_file, data_store = self._validation(key, file_name)
+        value_file, data_store = self._validation(key, val_file)
 
-        # Loading new data
-        with open(value_file, "r") as f:
-            # file closes after the execution of this block is completed.
-            file_data = f.read()
-
-        json_file: dict = json.loads(file_data)
+        json_file: dict = self._load_json_file(value_file)
 
         # Creating new data store obj
         if key in data_store:

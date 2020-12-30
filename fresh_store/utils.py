@@ -11,7 +11,45 @@ from .data import (
     MAX_KEY_CAPACITY,
     MAX_VALUE_SIZE,
     MAX_DATA_STORE_SIZE,
+    DATA_STORE_FILE_NAME,
 )
+
+
+def initialize_date_store_file(file_path: str = None) -> str:
+    """
+    initializes file path and creates file if does not exist
+    :param file_path: [ OPTIONAL ] entire path of data store file.
+    :return: returns entire path of data store file.
+    """
+    if file_path is None:
+        # FUNCTIONAL REQUIREMENTS - POINT 1
+        # If File Path is not provided, then set it as the
+        # current directory from where the script was called.
+        file_path = os.path.join(os.getcwd(), DATA_STORE_FILE_NAME)
+
+    if not os.path.exists(file_path):
+        # Create data store if does not exist
+        with open(file_path, 'w'):
+            pass
+    return file_path
+
+
+def rewrite_data_store(data_store_file: str, new_data_store: dict) -> None:
+    # Serialize data to be able to store more files.
+    # NON-FUNCTIONAL REQUIREMENTS - POINT 4
+    json_data_store: str = json.dumps(new_data_store, default=str)
+
+    with open(data_store_file, "w") as f:
+        # Override entire file
+        f.write(json_data_store)
+
+
+def load_json_file(file_path):
+    with open(file_path, "r") as f:
+        # file closes after the execution of this block is completed.
+        file_data = f.read()
+
+    return json.loads(file_data)
 
 
 def validate_key(key: str) -> None:
@@ -56,6 +94,8 @@ def validate_data_store(data_store: str, val_size: int) -> bool:
 
 
 def validate_date(expiry: str, key: str) -> None:
+    if type(expiry) == int:
+        return
     current_time = datetime.datetime.now()
     expiry_time = datetime.datetime.strptime(expiry, "%Y-%m-%d %H:%M:%S.%f")
 
