@@ -1,3 +1,6 @@
+import logging
+import threading
+
 from . import utils
 from .exceptions import KeyAlreadyExists
 
@@ -7,10 +10,13 @@ WHERE KEY IS MAPPED TO AN ARRAY
 WHOSE 1ST ELEMENT IS A JSON OBJECT
 AND 2ND ELEMENT IS THE EXPIRY TIME. (OR -1)
 """
+logging.basicConfig(level=logging.INFO)
 
 
 class FreshStore:
     def __init__(self, file_path: str = None):
+        # NON-FUNCTIONAL REQUIREMENTS - POINT 3
+        self._lock = threading.Lock()
         self.file_path = utils.initialize_date_store_file(file_path)
 
     # methods prepended with `__` are private.
@@ -64,7 +70,7 @@ class FreshStore:
     def __load_json_file(value_file):
         return utils.load_json_file(value_file)
 
-    def create(self, key: str, value_file: str, ttl: int = -1) -> None:
+    def __create(self, key: str, value_file: str, ttl: int = -1) -> None:
         """
         Creates an entry.
         :param key: key to be stored
@@ -87,9 +93,13 @@ class FreshStore:
 
         # FUNCTIONAL REQUIREMENTS - POINT 2
         self.__overwrite_data_store(data_store)
-        print("ENTRY CREATED!")
+        logging.info("ENTRY CREATED!")
 
-    def read(self, key: str) -> str:
+    def create(self, key: str, value_file: str, ttl: int = -1) -> None:
+        with self._lock:
+            return self.__create(key, value_file, ttl)
+
+    def __read(self, key: str) -> str:
         """
         Reads an entry if it exists.
         :param key: the key to search.
@@ -98,7 +108,7 @@ class FreshStore:
         data_store = self.__validation(key)
 
         if key not in data_store:
-            print("NOT FOUND")
+            logging.info("NOT FOUND")
             return ""
 
         expiry = data_store.get(key)[1]
@@ -106,10 +116,14 @@ class FreshStore:
 
         # FUNCTIONAL REQUIREMENTS - POINT 4
         ret = data_store.get(key)[0]
-        print("DATA RETURNED!")
+        logging.info("DATA RETURNED!")
         return ret
 
-    def delete(self, key: str) -> str:
+    def read(self, key: str) -> str:
+        with self._lock:
+            return self.__read(key)
+
+    def __delete(self, key: str) -> str:
         """
         deletes an entry if present
         :param key: the key to search.
@@ -118,7 +132,7 @@ class FreshStore:
         data_store = self.__validation(key)
 
         if key not in data_store:
-            print("NOT FOUND")
+            logging.info("NOT FOUND")
             return ""
 
         expiry = data_store.get(key)[1]
@@ -129,5 +143,9 @@ class FreshStore:
         self.__overwrite_data_store(data_store)
 
         # FUNCTIONAL REQUIREMENTS - POINT 5
-        print("DATA DELETED!")
+        logging.info("DATA DELETED!")
         return ret
+
+    def delete(self, key: str) -> str:
+        with self._lock:
+            return self.__delete(key)
