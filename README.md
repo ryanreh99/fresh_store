@@ -38,7 +38,7 @@ print(read_obj)
 python3 -m tests.test_api
 
 # See comment in tests/test_api.py
-# Remove `tearDownClass` method
+# Comment out the line mentioned there
 # and view TEST_DATA_STORE.json
 python3 tests/test_threading.py
 # Restore changes to test_api.py

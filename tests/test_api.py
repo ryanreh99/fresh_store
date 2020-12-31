@@ -69,7 +69,7 @@ class TestFreshStore(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        # Delete this class method for
+        # Comment out the `os.remove` line for
         # multithreading testing.
         #
         # Since synchronization is achieved with
@@ -77,6 +77,7 @@ class TestFreshStore(unittest.TestCase):
         # from all 3 threads, (def0, def1, def2)
         # and they won't be in order.
         os.remove(test_file)
+        pass
 
 
 if __name__ == '__main__':

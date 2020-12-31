@@ -4,13 +4,21 @@ import threading
 from . import utils
 from .exceptions import KeyAlreadyExists
 
-"""
-THE DATA STORE IS A JSON FILE
-WHERE KEY IS MAPPED TO AN ARRAY
-WHOSE 1ST ELEMENT IS A JSON OBJECT
-AND 2ND ELEMENT IS THE EXPIRY TIME. (OR -1)
-"""
 logging.basicConfig(level=logging.INFO)
+
+"""
+The data store is a json file, where the key is mapped
+to an array whose 1st element is a json object and the
+2nd element is the expiry time (can be -1 for no expiry).
+"""
+
+# NON-FUNCTIONAL REQUIREMENTS - POINT 2
+#
+# https://unix.stackexchange.com/questions/364660/are-threads-implemented-as-processes-on-linux
+# Threads belonging to the same process can have different process ids.
+# Thus not possible to distinguish between when to allow and deny file access,
+# without a 3rd party library.
+# File access has been granted here, and the operations are thread safe.
 
 
 class FreshStore:
