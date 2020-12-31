@@ -23,9 +23,9 @@ class FreshStore:
     def __get_data_store_file(self):
         return self.file_path
 
-    def __get_data_store(self, is_empty: bool = False) -> dict:
+    def __get_data_store(self) -> dict:
         data_store_file: str = self.__get_data_store_file()
-        return utils.get_data_store(data_store_file, is_empty)
+        return utils.get_data_store(data_store_file)
 
     @staticmethod
     def __validate_key(key: str) -> None:
@@ -43,12 +43,12 @@ class FreshStore:
         data_store_file: str = self.__get_data_store_file()
         return utils.validate_data_store(data_store_file, val_size)
 
-    def __validation(self, *args) -> dict:
+    def __validation(self, *args) -> None:
         """
         Validate key, value(if required) and data store
         :param args: 1st param - key to be created / read / deleted ...
                      2nd param - [OPTIONAL] file name / value to be validated before storing.
-        :return: the data store object.
+        :return: None.
         """
         key = args[0]
         self.__validate_key(key)
@@ -58,9 +58,7 @@ class FreshStore:
             value_file = args[1]
             val_size: int = self.__validate_value(value_file)
 
-        is_empty: bool = self.__validate_data_store(val_size)
-        data_store: dict = self.__get_data_store(is_empty)
-        return data_store
+        self.__validate_data_store(val_size)
 
     def __overwrite_data_store(self, new_data_store: dict) -> None:
         data_store_file: str = self.__get_data_store_file()
@@ -78,7 +76,8 @@ class FreshStore:
         :param ttl: Time in seconds
         :return: None
         """
-        data_store = self.__validation(key, value_file)
+        self.__validation(key, value_file)
+        data_store: dict = self.__get_data_store()
 
         json_file: dict = self.__load_json_file(value_file)
 
@@ -105,7 +104,8 @@ class FreshStore:
         :param key: the key to search.
         :return: the entry if found else ""
         """
-        data_store = self.__validation(key)
+        self.__validation(key)
+        data_store: dict = self.__get_data_store()
 
         if key not in data_store:
             logging.info("NOT FOUND")
@@ -129,7 +129,8 @@ class FreshStore:
         :param key: the key to search.
         :return: the now deleted entry if found else ""
         """
-        data_store = self.__validation(key)
+        self.__validation(key)
+        data_store: dict = self.__get_data_store()
 
         if key not in data_store:
             logging.info("NOT FOUND")

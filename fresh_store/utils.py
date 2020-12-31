@@ -31,6 +31,7 @@ def initialize_date_store_file(file_path: str = None) -> str:
         # Create data store if does not exist
         with open(file_path, 'w'):
             pass
+
     return file_path
 
 
@@ -58,6 +59,10 @@ def load_json_file(file_path: str) -> dict:
     with open(file_path, "r") as f:
         # file closes after the execution of this block is completed.
         file_data = f.read()
+
+    if len(file_data) == 0:
+        # Loading empty file raises json.decoder.JSONDecodeError error.
+        return {}
 
     return json.loads(file_data)
 
@@ -134,17 +139,12 @@ def get_expiry_date(ttl: int):
     return expiry
 
 
-def get_data_store(data_store_file: str, is_empty: bool = False) -> dict:
+def get_data_store(data_store_file: str) -> dict:
     """
     To get the data store object and check for empty file case.
     :param data_store_file: the data store file.
-    :param is_empty: for the check
     :return: the data store object
     """
-    if not is_empty:
-        json_data_store_file: dict = load_json_file(data_store_file)
-    else:
-        # Loading empty file raises json.decoder.JSONDecodeError error.
-        json_data_store_file: dict = {}
+    json_data_store_file: dict = load_json_file(data_store_file)
 
     return json_data_store_file

@@ -4,9 +4,9 @@ import threading
 
 
 def thread_function(name):
-    logging.info("Thread %s: starting", name)
+    logging.info(f"Thread {name}: starting")
     os.system(f"python3 -m tests.test_api --input={name}")
-    logging.info("Thread %s: finishing", name)
+    logging.info(f"Thread {name}: finishing")
 
 
 if __name__ == "__main__":
@@ -16,12 +16,12 @@ if __name__ == "__main__":
 
     threads = list()
     for index in range(3):
-        logging.info("Main    : create and start thread %d.", index)
+        logging.info(f"Main    : create and start thread {index}.")
         x = threading.Thread(target=thread_function, args=(index,))
         threads.append(x)
         x.start()
 
     for index, thread in enumerate(threads):
-        logging.info("Main    : before joining thread %d.", index)
+        logging.info(f"Main    : before joining thread {index}.")
         thread.join()
-        logging.info("Main    : thread %d done", index)
+        logging.info(f"Main    : thread {index} done")
