@@ -30,4 +30,4 @@ class ValueCapacityExceededError(Exception):
 
     def __str__(self):
         name: str = "data store" if self.is_internal else "file"
-        return f"{name} exceeds the {self.max_size} size limit."
+        return f"{name} exceeds the {self.max_size}B size limit."

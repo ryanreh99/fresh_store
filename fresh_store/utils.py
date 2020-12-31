@@ -3,10 +3,10 @@ import json
 import datetime
 
 from .data import (
-    MAX_KEY_CAPACITY,
-    MAX_VALUE_SIZE,
-    MAX_DATA_STORE_SIZE,
-    DATA_STORE_FILE_NAME,
+    get_MAX_KEY_CAPACITY,
+    get_MAX_VALUE_SIZE,
+    get_MAX_DATA_STORE_SIZE,
+    get_DATA_STORE_FILE_NAME,
 )
 from .exceptions import (
     KeyCapacityExceededError,
@@ -25,7 +25,7 @@ def initialize_date_store_file(file_path: str = None) -> str:
         # FUNCTIONAL REQUIREMENTS - POINT 1
         # If File Path is not provided, then set it as the
         # current directory from where the script was called.
-        file_path = os.path.join(os.getcwd(), DATA_STORE_FILE_NAME)
+        file_path = os.path.join(os.getcwd(), get_DATA_STORE_FILE_NAME())
 
     if not os.path.exists(file_path):
         # Create data store if does not exist
@@ -68,7 +68,7 @@ def validate_key(key: str) -> None:
     :param key: the key to be checked
     :return: None
     """
-    if len(key) > MAX_KEY_CAPACITY:
+    if len(key) > get_MAX_KEY_CAPACITY():
         # FUNCTIONAL REQUIREMENTS - POINT 2
         raise KeyCapacityExceededError(key)
 
@@ -80,9 +80,9 @@ def validate_value(value_file: str) -> int:
     :return: The file size to validate the data store file also.
     """
     file_size: int = os.stat(value_file).st_size
-    if file_size > MAX_VALUE_SIZE:
+    if file_size > get_MAX_VALUE_SIZE():
         # FUNCTIONAL REQUIREMENTS - POINT 2
-        raise ValueCapacityExceededError(is_internal=False, max_size=MAX_VALUE_SIZE)
+        raise ValueCapacityExceededError(is_internal=False, max_size=get_MAX_VALUE_SIZE())
 
     return file_size
 
@@ -96,9 +96,9 @@ def validate_data_store(data_store_file: str, val_size: int) -> bool:
     :return: Whether the data store is empty or not
     """
     data_store_size: int = os.stat(data_store_file).st_size
-    if data_store_size + val_size > MAX_DATA_STORE_SIZE:
-        # # NON-FUNCTIONAL REQUIREMENTS - POINT 1
-        raise ValueCapacityExceededError(is_internal=True, max_size=MAX_DATA_STORE_SIZE)
+    if data_store_size + val_size > get_MAX_DATA_STORE_SIZE():
+        # NON-FUNCTIONAL REQUIREMENTS - POINT 1
+        raise ValueCapacityExceededError(is_internal=True, max_size=get_MAX_DATA_STORE_SIZE())
 
     return data_store_size == 0
 
@@ -116,7 +116,7 @@ def validate_date(expiry: str, key: str) -> None:
     expiry_time = datetime.datetime.strptime(expiry, "%Y-%m-%d %H:%M:%S.%f")
 
     if current_time > expiry_time:
-        raise (KeyExpired(key))
+        raise KeyExpired(key)
 
 
 def get_expiry_date(ttl: int):

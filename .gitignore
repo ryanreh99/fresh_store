@@ -1,3 +1,5 @@
 .idea
 DATA_STORE.json
+TEST_DATA_STORE.json
 fresh_store/__pycache__/
+tests/__pycache__/
