@@ -69,8 +69,8 @@ class TestFreshStore(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        # Replace the below line with pass
-        # for multithreading testing
+        # Delete this class method for
+        # multithreading testing.
         #
         # Since synchronization is achieved with
         # locks, the final json contains the key
@@ -87,5 +87,5 @@ if __name__ == '__main__':
     args = parser.parse_args()
     sys.argv[1:] = args.unittest_args
 
-    thread_count = args.input
+    thread_count = str(args.input)
     unittest.main()
